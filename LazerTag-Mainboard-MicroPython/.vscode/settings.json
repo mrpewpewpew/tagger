@@ -1,0 +1,12 @@
+{
+    "python.analysis.typeCheckingMode": "basic",
+    "python.linting.enabled": true,
+    "python.languageServer": "Pylance",
+    "picowgo.syncFolder": "",
+    "python.analysis.typeshedPaths": [
+        ".vscode\\Pico-W-Stub"
+    ],
+    "python.analysis.extraPaths": [
+        ".vscode\\Pico-W-Stub\\stubs"
+    ]
+}

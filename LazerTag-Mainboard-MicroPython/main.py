@@ -18,12 +18,12 @@
 
 # // hardware layout:
 # //
-# // i2c to CubeCell Heltec
 # // i2c to display
 # // i2c + DMA for music
 # // pio via NEC library for IR transmission
 # // pio via NEC library for IR reception (how many ports?)
 # // UART for GPS
+# // UARD to HelTec Modem
 
 # // chip capability:
 # //
@@ -62,34 +62,43 @@
 # // I will modify the available NEC core to work with the higher
 # // frequency demanded by the open source lazertag protocol
 
+# imports
+
+from hw import gps
+
+import time
+
 # globals
 
 MODEM_TX            = 0 # gpio0 is pin 1
 MODEM_RX            = 1 # gpio1 is pin 2
-MODEM_PORT          = uart0 # uart hardware controller
+MODEM_PORT          = 0 # uart hardware controller
 MODEM_BAUD_RATE     = 115200
 
 GPS_TX              = 4 # gpio4 is pin 6
 GPS_RX              = 5 # gpio5 is pin 7
-GPS_PORT            = uart1 # uart hardware controller
+GPS_PORT            = 1 # uart hardware controller
 GPS_BAUD_RATE       = 115200
 
 DISPLAY_DATA        = 6 # gpio6 is pin 9
 DISPLAY_CLOCK       = 7 # gpio7 is pin 10
-DISPLAY_PORT        = i2c1 # i2c hardware controller
+DISPLAY_PORT        = 1 # i2c hardware controller
 DISPLAY_ADDRESS     = 0x3C
 DISPLAY_BAUD_RATE   = 115200
 
 SOUND_DATA          = 8 # gpio8 is pin 11
-SOUND_CLOCK         = 9 # gpio9 is pin 12
-SOUND_PORT          = i2c0 # i2c hardware controller
+SOUND_BIT_CLOCK     = 9 # gpio9 is pin 12
+SOUND_WORD_CLOCK    = 19 # gpio19 is pin 25
+
+SOUND_PORT          = 0 # pio hardware controller
+SOUND_BAUD_RATE     = 115200
 
 OPTIC_TX            = 10 # gpio10 is pin 14
 OPTIC_RXS           = [ 11, 12, 13, 14, 15 ] # pins 15, 16, 17, 19, 20
-OPTIC_PIO           = pio0 # programmable io controller
+OPTIC_PIO           = 0 # programmable io controller
 
-TRIGGER_RX          = 29
-RECOIL_TX           = 27
+TRIGGER_RX          = 22 # gpio22 is pin 29
+RECOIL_TX           = 21 # gpio21 is pin 27
 
 # // core1 will handle:
 # // optics, trigger pulls, recoil
@@ -111,9 +120,17 @@ RECOIL_TX           = 27
 
 # // UARTS: https://www.raspberrypi.com/documentation/pico-sdk/hardware.html#hardware_uart
 
-def start_core0:
+def start_core0():
+    assert(MODEM_PORT != GPS_PORT) # uarts
+    assert(DISPLAY_PORT != SOUND_PORT) # i2cs
     
-    pass
+    #modem.init(MODEM_PORT, MODEM_TX, MODEM_RX, MODEM_BAUD_RATE)
+    gps.init(GPS_PORT, GPS_TX, GPS_RX, GPS_BAUD_RATE)
+    #led.init(DISPLAY_PORT, DISPLAY_CLOCK, DISPLAY_DATA, DISPLAY_BAUD_RATE, DISPLAY_ADDRESS)
+    #sound.init(SOUND_PORT, SOUND_CLOCK, SOUND_DATA, SOUND_BAUD_RATE)
+
+    while True:
+        time.sleep(1)
 
 
 if __name__ == "__main__":
